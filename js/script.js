@@ -1,4 +1,5 @@
 let main = document.querySelector('.mainHolder');
+let searchBox = document.querySelector('.autosuggest');
 
 let genreList = {
 	28: 'Action',
@@ -34,7 +35,7 @@ function setVisible(a) {
 		overviewContent[a].style.display = 'block';
 		commentContent[a].style.display = 'block';
 		videoContent[a].style.display = 'block';
-		moreButton[a].style.backgroundColor = '#0085ffbf';
+		moreButton[a].style.backgroundColor = 'rgb(255 0 0 / 75%)';
 		moreButton[a].innerHTML = 'Less';
 	} else {
 		castCrew[a].style.display = 'none';
@@ -56,6 +57,7 @@ const searchUrl =
 function getUserInput(event) {
 	if (event.keyCode == 13 && userInput.value != '') {
 		queryString = '';
+		searchBox.style.display = 'none';
 		for (var i of userInput.value) {
 			if (i != ' ') {
 				queryString += i;
@@ -70,11 +72,12 @@ function getUserInput(event) {
 }
 
 let getMovie = async () => {
+	let printStr = '';
 	try {
 		const res = await fetch(`${searchUrl}${queryString}`);
 		const data = await res.json();
 		let searchResults = data.results;
-		let printStr = '';
+
 		main.innerHTML = '';
 		if (searchResults != 0) {
 			let a = 0;
@@ -117,7 +120,7 @@ let getMovie = async () => {
 			
 				<!-- Overview -->
 				<div class="overviewContent">
-					<h4>Overview</h4>
+					<h5>Overview</h5>
 					<p id="overview">
 					${result.overview}
 					</p>
@@ -206,43 +209,46 @@ let loadCastCrew = async (ccUrl, a) => {
 
 // To fetch the user review
 let loadReviewUrl = async (reviewUrl, a) => {
+	let review = '';
 	try {
 		let res = await fetch(reviewUrl);
 		let reviewData = await res.json();
-
-		let review = '';
 
 		let commentContent = document.querySelectorAll('#commentContent');
 
 		var results = reviewData.results;
 
 		if (results.length != 0) {
-			results.forEach((r) => {
-				review += `<h5>${r.author}</h5>
-				<p id="userComment">${r.content}
+			let n = 2;
+			if (results.length <= 1) {
+				n = 1;
+			}
+			for (let i = 0; i < n; i++) {
+				review += `<h5>${results[i].author}</h5>
+				<p id="userComment">${results[i].content}
 				</p></br>`;
-			});
+			}
 
 			commentContent[a].innerHTML = review;
 		} else {
-			review += `<h5>No User Review Found</h5>`;
+			review += `<h5>No Reviews yet</h5>`;
 
 			commentContent[a].innerHTML = review;
 		}
 	} catch (error) {
 		review += `<h5>${error.message}</h5>`;
-
+		console.log(error.message);
 		commentContent[a].innerHTML = review;
 	}
 };
 
 // To load trailer and teaser
 let loadVideoUrl = async (videoUrl, a) => {
+	let printVideo = '';
+
 	try {
 		let res = await fetch(videoUrl);
 		let videoData = await res.json();
-
-		let printVideo = '';
 
 		var results = videoData.results;
 
@@ -250,18 +256,26 @@ let loadVideoUrl = async (videoUrl, a) => {
 
 		results.forEach((v) => {
 			if (v.type == 'Trailer' || v.type == 'Teaser') {
-				printVideo += `<h4>${v.type}</h4>
-				<iframe src="https://www.youtube.com/embed/${v.key}"> </iframe>
+				printVideo += `<h5>${v.type}</h5>
+				<iframe src="https://www.youtube.com/embed/${v.key}" id="iframe"> </iframe>
 				`;
 
 				videoContent[a].innerHTML = printVideo;
 			}
 		});
 	} catch (error) {
-		printVideo += `<h4>${error.message}</h4>`;
+		printVideo += `<h5>${error.message}</h5>`;
 
 		videoContent[a].innerHTML = printVideo;
 	}
 };
+
+function showSearch() {
+	if (searchBox.style.display == 'none') {
+		searchBox.style.display = 'flex';
+	} else {
+		searchBox.style.display = 'none';
+	}
+}
 
 window.onload = getMovie;
