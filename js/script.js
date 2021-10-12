@@ -1,5 +1,7 @@
 let main = document.querySelector('.mainHolder');
 let searchBox = document.querySelector('.autosuggest');
+let inputSearch = document.getElementById('suggestion-search');
+let selectType = document.getElementById('type');
 
 let genreList = {
 	28: 'Action',
@@ -30,27 +32,29 @@ function setVisible(a) {
 	let commentContent = document.querySelectorAll('.commentContent');
 	let videoContent = document.querySelectorAll('.videoContent');
 
-	if (moreButton[a].innerHTML == 'More') {
+	if (moreButton[a].innerHTML == 'Show More...') {
 		castCrew[a].style.display = 'grid';
 		overviewContent[a].style.display = 'block';
 		commentContent[a].style.display = 'block';
 		videoContent[a].style.display = 'block';
-		moreButton[a].style.backgroundColor = 'rgb(255 0 0 / 75%)';
-		moreButton[a].innerHTML = 'Less';
+		moreButton[a].style.gridRowStart = 7;
+		moreButton[a].style.backgroundColor = 'rgb(243,195,24)';
+		moreButton[a].innerHTML = 'Show Less...';
 	} else {
 		castCrew[a].style.display = 'none';
 		overviewContent[a].style.display = 'none';
 		commentContent[a].style.display = 'none';
 		videoContent[a].style.display = 'none';
-		moreButton[a].style.backgroundColor = 'brown';
-		moreButton[a].innerHTML = 'More';
+		moreButton[a].style.gridRowStart = 3;
+		moreButton[a].style.backgroundColor = 'rgb(243,195,24)';
+		moreButton[a].innerHTML = 'Show More...';
 	}
 }
 
 //Get search input
 let userInput = document.querySelector('.userInput');
 userInput.addEventListener('keypress', getUserInput);
-var queryString = 'El+Camino+A+Breaking+Bad+Movie';
+var queryString = 'Mission+Impossible';
 const searchUrl =
 	'https://api.themoviedb.org/3/search/movie?api_key=88dcd9cb9f6760e409b5331dd47b4d9c&query=';
 
@@ -65,7 +69,14 @@ function getUserInput(event) {
 				queryString += '+';
 			}
 		}
-		getMovie();
+
+		localStorage.setItem('queryString', queryString);
+
+		if (selectType.value == 'tv') {
+			location.replace('/displayTv.html');
+		} else {
+			location.replace('/displayResult.html');
+		}
 	} else if (event.keyCode == 13 && userInput.value == '') {
 		alert('Please enter a movie name');
 	}
@@ -98,6 +109,12 @@ let getMovie = async () => {
 				loadReviewUrl(reviewUrl, a);
 				loadVideoUrl(videoUrl, a);
 
+				let overview;
+				if (result.overview.length <= 1) {
+					overview = 'Overview not found';
+				} else {
+					overview = result.overview;
+				}
 				// Printing of Main Content after data is fetched
 				printStr = `
 				<div class="container content">
@@ -105,24 +122,24 @@ let getMovie = async () => {
 				<div class="imageContainer">
 					<img
 						src="https://www.themoviedb.org/t/p/w1280/${result.poster_path}"
-						alt="Broken Image"
+						alt="No Image"
 						id="contentImage"
 					/>
 				</div>
 			
 				<!-- Other Main Content -->
 				<div class="otherContainer">
-					<h3 id="contentHeading">${result.original_title}</h3>
+					<h3 id="contentHeading">${result.title}</h3>
 					<p id="date">Released on : ${result.release_date}</p>
-					<p id="rating">Rating: ${result.vote_average} / 10</p>
-					<p id="genre">Genre: ${movieGenre.join(' ')}</p>
+					<p id="rating">Rating : ${result.vote_average} / 10</p>
+					<p id="genre">Genre : ${movieGenre.join(', ')}</p>
 				</div>
 			
 				<!-- Overview -->
 				<div class="overviewContent">
 					<h5>Overview</h5>
 					<p id="overview">
-					${result.overview}
+					${overview}
 					</p>
 				</div>
 			
@@ -146,7 +163,7 @@ let getMovie = async () => {
 				</div> 
 			
 				<!-- More button -->
-				<button type="button" class="btn more" id="more" onclick="setVisible(${a})">More</button>
+				<button type="button" class="btn more" id="more" onclick="setVisible(${a})">Show More..</button>
 			</div>`;
 				main.innerHTML += printStr;
 
@@ -254,28 +271,21 @@ let loadVideoUrl = async (videoUrl, a) => {
 
 		let videoContent = document.querySelectorAll('.videoContent');
 
-		results.forEach((v) => {
-			if (v.type == 'Trailer' || v.type == 'Teaser') {
-				printVideo += `<h5>${v.type}</h5>
-				<iframe src="https://www.youtube.com/embed/${v.key}" id="iframe"> </iframe>
+		for (let i = 0; i < results.length; i++) {
+			if (results[i].type == 'Trailer') {
+				printVideo += `<h5>${results[i].type}</h5>
+				<iframe src="https://www.youtube.com/embed/${results[i].key}" id="iframe"> </iframe>
 				`;
 
 				videoContent[a].innerHTML = printVideo;
+				return;
 			}
-		});
+		}
 	} catch (error) {
 		printVideo += `<h5>${error.message}</h5>`;
 
 		videoContent[a].innerHTML = printVideo;
 	}
 };
-
-function showSearch() {
-	if (searchBox.style.display == 'none') {
-		searchBox.style.display = 'flex';
-	} else {
-		searchBox.style.display = 'none';
-	}
-}
 
 window.onload = getMovie;
