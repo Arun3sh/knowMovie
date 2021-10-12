@@ -4,47 +4,50 @@
 		<meta charset="UTF-8" />
 		<meta http-equiv="X-UA-Compatible" content="IE=edge" />
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-		<title>Movie Ratings</title>
+		<title>Movie</title>
 		<link rel="stylesheet" href="./css/bootstrap.min.css" />
 		<link rel="stylesheet" href="./css/style.css" />
 	</head>
 	<body>
-		<!-- Bottom Navbar for small screen devices -->
-		<nav class="navbar sticky-top navbar-light bg-light" id="bottomNav">
-			<div class="container-fluid">
+		<!-- Top Navbar for small screen devices -->
+		<nav class="navbar sticky-top navbar-light" id="topNav">
+			<div class="container-fluid padding">
 				<a class="navbar-brand" href="#">
-					<img src="/assets/icons/home.png" alt="" />
+					<img src="/assets/icons/homeYellowBlackBG.png" alt="" />
 				</a>
-				<a class="navbar-brand" href="#">
-					<img src="/assets/icons/search.png" alt="" onclick="showSearch()" />
-				</a>
-				<a class="navbar-brand" href="#">
-					<img src="/assets/icons/filter.png" alt="" />
-				</a>
-			</div>
 
-			<!-- SearchBox Content -->
-			<div class="searchBox">
-				<div class="autosuggest">
-					<input
-						type="text"
-						value=""
-						autocomplete="off"
-						aria-autocomplete="list"
-						aria-controls="react-autowhatever-1"
-						class="userInput"
-						id="suggestion-search"
-						placeholder="Search MovieDb"
-						autocapitalize="off"
-						autocorrect="off"
-					/>
+				<!-- SearchBox Content -->
+				<div class="searchBox">
+					<div class="autosuggest">
+						<select name="" id="type">
+							<option value="movie" selected>Movie</option>
+							<option value="tv">TV Shows</option>
+						</select>
+						<input
+							type="text"
+							value=""
+							autocomplete="off"
+							aria-autocomplete="list"
+							aria-controls="react-autowhatever-1"
+							class="userInput"
+							id="suggestion-search"
+							placeholder="Please type here..."
+							autocapitalize="off"
+							autocorrect="off"
+							onfocus="this.value=''"
+						/>
+					</div>
 				</div>
+
+				<a class="navbar-brand" href="#">
+					<img src="/assets/icons/logo.jpg" alt="" />
+				</a>
 			</div>
 		</nav>
 
 		<!-- Main Content -->
 		<main>
-			<div class="mainHolder"></div>
+			<div class="container mainHolder"></div>
 		</main>
 
 		<!-- Script tags -->
