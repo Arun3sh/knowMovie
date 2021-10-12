@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>Search Result</title>
+		<link rel="stylesheet" href="./css/bootstrap.min.css" />
+		<link rel="stylesheet" href="./css/style.css" />
+	</head>
+	<body>
+		<!-- Top Navbar for small screen devices -->
+		<nav class="navbar sticky-top navbar-light" id="topNav">
+			<div class="container-fluid">
+				<a class="navbar-brand" href="/index.html">
+					<img src="/assets/icons/homeYellowBlackBG.png" alt="" />
+				</a>
+
+				<!-- SearchBox Content -->
+				<div class="searchBox">
+					<div class="autosuggest">
+						<select name="" id="type">
+							<option value="movie" selected>Movie</option>
+							<option value="tv">TV Shows</option>
+						</select>
+						<input
+							type="text"
+							value=""
+							autocomplete="off"
+							aria-autocomplete="list"
+							aria-controls="react-autowhatever-1"
+							class="userInput"
+							id="suggestion-search"
+							placeholder="Please type here..."
+							autocapitalize="off"
+							autocorrect="off"
+							onfocus="this.value=''"
+						/>
+					</div>
+				</div>
+
+				<a class="navbar-brand" href="#">
+					<img src="/assets/icons/logo.jpg" alt="" />
+				</a>
+			</div>
+		</nav>
+		<!-- Main Content -->
+		<main>
+			<div class="container mainHolder"></div>
+		</main>
+
+		<!-- Script tags -->
+		<script src="./js/jquery-3.6.0.min.js"></script>
+		<script src="./js/bootstrap.min.js"></script>
+		<script src="./js/forDisplayResult.js"></script>
+	</body>
+</html>
