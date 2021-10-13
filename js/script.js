@@ -3,6 +3,7 @@ let searchBox = document.querySelector('.autosuggest');
 let inputSearch = document.getElementById('suggestion-search');
 let selectType = document.getElementById('type');
 
+// Genre List
 let genreList = {
 	28: 'Action',
 	12: 'Adventure',
@@ -33,17 +34,16 @@ let genreList = {
 	10768: 'War & Politics',
 };
 
+// To Display additional info based on show more or show less button
 function setVisible(a) {
 	let moreButton = document.querySelectorAll('#more');
 	let overviewContent = document.querySelectorAll('.overviewContent');
 	let castCrew = document.querySelectorAll('.castCrew');
-	// let commentContent = document.querySelectorAll('.commentContent');
 	let videoContent = document.querySelectorAll('.videoContent');
 
 	if (moreButton[a].innerHTML == 'Show More...') {
 		castCrew[a].style.display = 'grid';
 		overviewContent[a].style.display = 'block';
-		// commentContent[a].style.display = 'block';
 		videoContent[a].style.display = 'block';
 		moreButton[a].style.gridRowStart = 6;
 		moreButton[a].style.backgroundColor = 'rgb(243,195,24)';
@@ -51,7 +51,6 @@ function setVisible(a) {
 	} else {
 		castCrew[a].style.display = 'none';
 		overviewContent[a].style.display = 'none';
-		// commentContent[a].style.display = 'none';
 		videoContent[a].style.display = 'none';
 		moreButton[a].style.gridRowStart = 3;
 		moreButton[a].style.backgroundColor = 'rgb(243,195,24)';
@@ -59,10 +58,13 @@ function setVisible(a) {
 	}
 }
 
-//Get search input
+//To get search input on keypress(enter)
 let userInput = document.querySelector('.userInput');
+
 userInput.addEventListener('keypress', getUserInput);
+
 var queryString = '';
+
 const searchUrl =
 	'https://api.themoviedb.org/3/trending/all/day?api_key=88dcd9cb9f6760e409b5331dd47b4d9c';
 
@@ -74,12 +76,14 @@ function getUserInput(event) {
 	}
 }
 
+// To get user input incase of button click
 function getUserInputButton() {
 	if (userInput.value != '') {
 		setQueryString();
 	}
 }
 
+// To set the query string and to pass this in local storage to retreive in other page
 function setQueryString() {
 	queryString = '';
 
@@ -93,6 +97,7 @@ function setQueryString() {
 
 	localStorage.setItem('queryString', queryString);
 
+	// To navigate to respective page based on type selection
 	if (selectType.value == 'tv') {
 		location.replace('/displayTv.html');
 	} else {
@@ -100,8 +105,10 @@ function setQueryString() {
 	}
 }
 
+// To get the display all the trending shows
 let getMovie = async () => {
 	let printStr = '';
+
 	try {
 		const res = await fetch(`${searchUrl}`);
 		const data = await res.json();
@@ -110,6 +117,8 @@ let getMovie = async () => {
 		main.innerHTML = '';
 		if (searchResults != 0) {
 			let a = 0;
+
+			// Foreach to print data
 			searchResults.forEach((result) => {
 				// To load the Genre of the movie
 				var genre = result.genre_ids;
@@ -121,15 +130,13 @@ let getMovie = async () => {
 				// URL for cast crew
 				let ccUrl = `https://api.themoviedb.org/3/movie/${result.id}/credits?api_key=88dcd9cb9f6760e409b5331dd47b4d9c&language=en-US`;
 				let ccUrlTv = `https://api.themoviedb.org/3/tv/${result.id}/credits?api_key=88dcd9cb9f6760e409b5331dd47b4d9c&language=en-US`;
-				//let videoUrl = `https://api.themoviedb.org/3/movie/${result.id}/videos?api_key=88dcd9cb9f6760e409b5331dd47b4d9c&language=en-US`;
 
+				// To check if it is a tv show or movie
 				if (typeof result.title == 'undefined') {
 					loadCastCrew(ccUrlTv, a);
 				} else {
 					loadCastCrew(ccUrl, a);
 				}
-
-				// loadVideoUrl(videoUrl, a);
 
 				let titleName;
 				let release;
@@ -150,7 +157,7 @@ let getMovie = async () => {
 				} else {
 					overview = result.overview;
 				}
-				// Printing of Main Content after data is fetched
+
 				printStr = `
 				<div class="container content">
 				<!-- Image of Movie -->
