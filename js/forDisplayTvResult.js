@@ -71,25 +71,35 @@ userInput.addEventListener('keypress', getUserInput);
 
 function getUserInput(event) {
 	if (event.keyCode == 13 && userInput.value != '') {
-		queryString = '';
-		searchBox.style.display = 'none';
-		for (var i of userInput.value) {
-			if (i != ' ') {
-				queryString += i;
-			} else {
-				queryString += '+';
-			}
-		}
-
-		localStorage.setItem('queryString', queryString);
-		// getMovie();
-		if (selectType.value == 'tv') {
-			location.replace('/displayTv.html');
-		} else {
-			location.replace('/displayResult.html');
-		}
+		setQueryString();
 	} else if (event.keyCode == 13 && userInput.value == '') {
 		alert('Please enter a movie name');
+	}
+}
+
+function getUserInputButton() {
+	if (userInput.value != '') {
+		setQueryString();
+	}
+}
+
+function setQueryString() {
+	queryString = '';
+
+	for (var i of userInput.value) {
+		if (i != ' ') {
+			queryString += i;
+		} else {
+			queryString += '+';
+		}
+	}
+
+	localStorage.setItem('queryString', queryString);
+
+	if (selectType.value == 'tv') {
+		location.replace('/displayTv.html');
+	} else {
+		location.replace('/displayResult.html');
 	}
 }
 
