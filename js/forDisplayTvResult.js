@@ -1,11 +1,12 @@
+// The queryString and type are retrieved via local storage and stored in variables
 let queryString = localStorage.getItem('queryString');
-
 let selectType = document.getElementById('type');
 
 let main = document.querySelector('.mainHolder');
 let searchBox = document.querySelector('.autosuggest');
 let inputSearch = document.getElementById('suggestion-search');
 
+// to get the genre
 let genreList = {
 	28: 'Action',
 	12: 'Adventure',
@@ -39,6 +40,7 @@ let genreList = {
 const searchUrl =
 	'https://api.themoviedb.org/3/search/tv?api_key=88dcd9cb9f6760e409b5331dd47b4d9c&query=';
 
+// To Display additional info based on show more or show less button
 function setVisible(a) {
 	let moreButton = document.querySelectorAll('#more');
 	let overviewContent = document.querySelectorAll('.overviewContent');
@@ -65,7 +67,7 @@ function setVisible(a) {
 	}
 }
 
-//Get search input
+//Get search input on keypress event
 let userInput = document.querySelector('.userInput');
 userInput.addEventListener('keypress', getUserInput);
 
@@ -77,12 +79,14 @@ function getUserInput(event) {
 	}
 }
 
+//Get search input on button click event
 function getUserInputButton() {
 	if (userInput.value != '') {
 		setQueryString();
 	}
 }
 
+// To set the query string and to pass this in local storage to retreive in other page
 function setQueryString() {
 	queryString = '';
 
@@ -96,6 +100,7 @@ function setQueryString() {
 
 	localStorage.setItem('queryString', queryString);
 
+	// To navigate to respective page based on type selection
 	if (selectType.value == 'tv') {
 		location.replace('/displayTv.html');
 	} else {
@@ -103,6 +108,7 @@ function setQueryString() {
 	}
 }
 
+// To get the display all the trending shows
 let getMovie = async () => {
 	let printStr = '';
 	try {
@@ -136,6 +142,7 @@ let getMovie = async () => {
 				} else {
 					overview = result.overview;
 				}
+
 				// Printing of Main Content after data is fetched
 				printStr = `
 				<div class="container content">
@@ -288,18 +295,5 @@ let loadVideoUrl = async (videoUrl, a) => {
 		videoContent[a].innerHTML = printVideo;
 	}
 };
-
-function showTvSearch() {
-	if (
-		searchBox.style.display == 'none' &&
-		(inputSearch.placeholder == 'Search TV Shows' || inputSearch.placeholder == 'Search Movies')
-	) {
-		inputSearch.placeholder = 'Search TV Shows';
-		searchBox.placeholder = 'Search TV Shows';
-		searchBox.style.display = 'flex';
-	} else {
-		searchBox.style.display = 'none';
-	}
-}
 
 window.onload = getMovie;
