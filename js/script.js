@@ -12,6 +12,8 @@ let genreList = {
 	99: 'Documentary',
 	18: 'Drama',
 	10751: 'Family',
+	10762: 'Kids',
+	10763: 'News',
 	14: 'Fantasy',
 	36: 'History',
 	27: 'Horror',
@@ -23,27 +25,33 @@ let genreList = {
 	53: 'Thriller',
 	10752: 'War',
 	37: 'Western',
+	10759: 'Action & Adventure',
+	10764: 'Reality',
+	10765: 'Sci-Fi & Fantasy',
+	10766: 'Soap',
+	10767: 'Talk',
+	10768: 'War & Politics',
 };
 
 function setVisible(a) {
 	let moreButton = document.querySelectorAll('#more');
 	let overviewContent = document.querySelectorAll('.overviewContent');
 	let castCrew = document.querySelectorAll('.castCrew');
-	let commentContent = document.querySelectorAll('.commentContent');
+	// let commentContent = document.querySelectorAll('.commentContent');
 	let videoContent = document.querySelectorAll('.videoContent');
 
 	if (moreButton[a].innerHTML == 'Show More...') {
 		castCrew[a].style.display = 'grid';
 		overviewContent[a].style.display = 'block';
-		commentContent[a].style.display = 'block';
+		// commentContent[a].style.display = 'block';
 		videoContent[a].style.display = 'block';
-		moreButton[a].style.gridRowStart = 7;
+		moreButton[a].style.gridRowStart = 6;
 		moreButton[a].style.backgroundColor = 'rgb(243,195,24)';
 		moreButton[a].innerHTML = 'Show Less...';
 	} else {
 		castCrew[a].style.display = 'none';
 		overviewContent[a].style.display = 'none';
-		commentContent[a].style.display = 'none';
+		// commentContent[a].style.display = 'none';
 		videoContent[a].style.display = 'none';
 		moreButton[a].style.gridRowStart = 3;
 		moreButton[a].style.backgroundColor = 'rgb(243,195,24)';
@@ -54,38 +62,48 @@ function setVisible(a) {
 //Get search input
 let userInput = document.querySelector('.userInput');
 userInput.addEventListener('keypress', getUserInput);
-var queryString = 'Mission+Impossible';
+var queryString = '';
 const searchUrl =
-	'https://api.themoviedb.org/3/search/movie?api_key=88dcd9cb9f6760e409b5331dd47b4d9c&query=';
+	'https://api.themoviedb.org/3/trending/all/day?api_key=88dcd9cb9f6760e409b5331dd47b4d9c';
 
 function getUserInput(event) {
 	if (event.keyCode == 13 && userInput.value != '') {
-		queryString = '';
-		searchBox.style.display = 'none';
-		for (var i of userInput.value) {
-			if (i != ' ') {
-				queryString += i;
-			} else {
-				queryString += '+';
-			}
-		}
-
-		localStorage.setItem('queryString', queryString);
-
-		if (selectType.value == 'tv') {
-			location.replace('/displayTv.html');
-		} else {
-			location.replace('/displayResult.html');
-		}
+		setQueryString();
 	} else if (event.keyCode == 13 && userInput.value == '') {
 		alert('Please enter a movie name');
+	}
+}
+
+function getUserInputButton() {
+	if (userInput.value != '') {
+		setQueryString();
+	}
+}
+
+function setQueryString() {
+	queryString = '';
+
+	for (var i of userInput.value) {
+		if (i != ' ') {
+			queryString += i;
+		} else {
+			queryString += '+';
+		}
+	}
+
+	localStorage.setItem('queryString', queryString);
+
+	if (selectType.value == 'tv') {
+		location.replace('/displayTv.html');
+	} else {
+		location.replace('/displayResult.html');
 	}
 }
 
 let getMovie = async () => {
 	let printStr = '';
 	try {
-		const res = await fetch(`${searchUrl}${queryString}`);
+		const res = await fetch(`${searchUrl}`);
 		const data = await res.json();
 		let searchResults = data.results;
 
@@ -100,14 +118,31 @@ let getMovie = async () => {
 					movieGenre.push(genreList[gen]);
 				});
 
-				// URL for cast crew, User review and videos(trailer teaser)
+				// URL for cast crew
 				let ccUrl = `https://api.themoviedb.org/3/movie/${result.id}/credits?api_key=88dcd9cb9f6760e409b5331dd47b4d9c&language=en-US`;
-				let reviewUrl = `https://api.themoviedb.org/3/movie/${result.id}/reviews?api_key=88dcd9cb9f6760e409b5331dd47b4d9c&language=en-US`;
-				let videoUrl = `https://api.themoviedb.org/3/movie/${result.id}/videos?api_key=88dcd9cb9f6760e409b5331dd47b4d9c&language=en-US`;
+				let ccUrlTv = `https://api.themoviedb.org/3/tv/${result.id}/credits?api_key=88dcd9cb9f6760e409b5331dd47b4d9c&language=en-US`;
+				//let videoUrl = `https://api.themoviedb.org/3/movie/${result.id}/videos?api_key=88dcd9cb9f6760e409b5331dd47b4d9c&language=en-US`;
 
-				loadCastCrew(ccUrl, a);
-				loadReviewUrl(reviewUrl, a);
-				loadVideoUrl(videoUrl, a);
+				if (typeof result.title == 'undefined') {
+					loadCastCrew(ccUrlTv, a);
+				} else {
+					loadCastCrew(ccUrl, a);
+				}
+
+				// loadVideoUrl(videoUrl, a);
+
+				let titleName;
+				let release;
+				let releaseTitle;
+				if (typeof result.title == 'undefined') {
+					titleName = result.name;
+					releaseTitle = 'First Air Date';
+					release = result.first_air_date;
+				} else {
+					titleName = result.title;
+					releaseTitle = 'Released On';
+					release = result.release_date;
+				}
 
 				let overview;
 				if (result.overview.length <= 1) {
@@ -129,8 +164,8 @@ let getMovie = async () => {
 			
 				<!-- Other Main Content -->
 				<div class="otherContainer">
-					<h3 id="contentHeading">${result.title}</h3>
-					<p id="date">Released on : ${result.release_date}</p>
+					<h3 id="contentHeading">${titleName}</h3>
+					<p id="date">${releaseTitle} : ${release}</p>
 					<p id="rating">Rating : ${result.vote_average} / 10</p>
 					<p id="genre">Genre : ${movieGenre.join(', ')}</p>
 				</div>
@@ -156,17 +191,22 @@ let getMovie = async () => {
 					<p id="cast">Cast</p>
 				</div>
 			
-				<!-- Comment -->
-				<div class="commentContent">
-				<h5>User Review</h5>
-				<p id="commentContent">User Review</p>					
-				</div> 
-			
 				<!-- More button -->
-				<button type="button" class="btn more" id="more" onclick="setVisible(${a})">Show More..</button>
+				<button type="button" class="btn more" id="more" onclick="setVisible(${a})">Show More...</button>
 			</div>`;
 				main.innerHTML += printStr;
 
+				a++;
+			});
+			a = 0;
+			searchResults.forEach((result) => {
+				if (typeof result.title == 'undefined') {
+					videoUrl = `https://api.themoviedb.org/3/tv/${result.id}/videos?api_key=88dcd9cb9f6760e409b5331dd47b4d9c&language=en-US`;
+				} else {
+					videoUrl = `https://api.themoviedb.org/3/movie/${result.id}/videos?api_key=88dcd9cb9f6760e409b5331dd47b4d9c&language=en-US`;
+				}
+
+				loadVideoUrl(videoUrl, a);
 				a++;
 			});
 		} else {
@@ -224,52 +264,16 @@ let loadCastCrew = async (ccUrl, a) => {
 	}
 };
 
-// To fetch the user review
-let loadReviewUrl = async (reviewUrl, a) => {
-	let review = '';
-	try {
-		let res = await fetch(reviewUrl);
-		let reviewData = await res.json();
-
-		let commentContent = document.querySelectorAll('#commentContent');
-
-		var results = reviewData.results;
-
-		if (results.length != 0) {
-			let n = 2;
-			if (results.length <= 1) {
-				n = 1;
-			}
-			for (let i = 0; i < n; i++) {
-				review += `<h5>${results[i].author}</h5>
-				<p id="userComment">${results[i].content}
-				</p></br>`;
-			}
-
-			commentContent[a].innerHTML = review;
-		} else {
-			review += `<h5>No Reviews yet</h5>`;
-
-			commentContent[a].innerHTML = review;
-		}
-	} catch (error) {
-		review += `<h5>${error.message}</h5>`;
-		console.log(error.message);
-		commentContent[a].innerHTML = review;
-	}
-};
-
 // To load trailer and teaser
 let loadVideoUrl = async (videoUrl, a) => {
 	let printVideo = '';
+	let videoContent = document.querySelectorAll('.videoContent');
 
 	try {
 		let res = await fetch(videoUrl);
 		let videoData = await res.json();
 
 		var results = videoData.results;
-
-		let videoContent = document.querySelectorAll('.videoContent');
 
 		for (let i = 0; i < results.length; i++) {
 			if (results[i].type == 'Trailer') {
@@ -282,8 +286,8 @@ let loadVideoUrl = async (videoUrl, a) => {
 			}
 		}
 	} catch (error) {
-		printVideo += `<h5>${error.message}</h5>`;
-
+		printVideo += `<h5>${(error.message, a)}</h5>`;
+		console.log(error.message);
 		videoContent[a].innerHTML = printVideo;
 	}
 };
