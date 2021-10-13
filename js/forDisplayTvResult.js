@@ -16,8 +16,6 @@ let genreList = {
 	99: 'Documentary',
 	18: 'Drama',
 	10751: 'Family',
-	10762: 'Kids',
-	10763: 'News',
 	14: 'Fantasy',
 	36: 'History',
 	27: 'Horror',
@@ -29,16 +27,10 @@ let genreList = {
 	53: 'Thriller',
 	10752: 'War',
 	37: 'Western',
-	10759: 'Action & Adventure',
-	10764: 'Reality',
-	10765: 'Sci-Fi & Fantasy',
-	10766: 'Soap',
-	10767: 'Talk',
-	10768: 'War & Politics',
 };
 
 const searchUrl =
-	'https://api.themoviedb.org/3/search/tv?api_key=88dcd9cb9f6760e409b5331dd47b4d9c&query=';
+	'https://api.themoviedb.org/3/search/movie?api_key=88dcd9cb9f6760e409b5331dd47b4d9c&query=';
 
 // To Display additional info based on show more or show less button
 function setVisible(a) {
@@ -128,9 +120,9 @@ let getMovie = async () => {
 				});
 
 				// URL for cast crew, User review and videos(trailer teaser)
-				let ccUrl = `https://api.themoviedb.org/3/tv/${result.id}/credits?api_key=88dcd9cb9f6760e409b5331dd47b4d9c&language=en-US`;
-				let reviewUrl = `https://api.themoviedb.org/3/tv/${result.id}/reviews?api_key=88dcd9cb9f6760e409b5331dd47b4d9c&language=en-US`;
-				let videoUrl = `https://api.themoviedb.org/3/tv/${result.id}/videos?api_key=88dcd9cb9f6760e409b5331dd47b4d9c&language=en-US`;
+				let ccUrl = `https://api.themoviedb.org/3/movie/${result.id}/credits?api_key=88dcd9cb9f6760e409b5331dd47b4d9c&language=en-US`;
+				let reviewUrl = `https://api.themoviedb.org/3/movie/${result.id}/reviews?api_key=88dcd9cb9f6760e409b5331dd47b4d9c&language=en-US`;
+				let videoUrl = `https://api.themoviedb.org/3/movie/${result.id}/videos?api_key=88dcd9cb9f6760e409b5331dd47b4d9c&language=en-US`;
 
 				loadCastCrew(ccUrl, a);
 				loadReviewUrl(reviewUrl, a);
@@ -157,8 +149,8 @@ let getMovie = async () => {
 			
 				<!-- Other Main Content -->
 				<div class="otherContainer">
-					<h3 id="contentHeading">${result.name}</h3>
-					<p id="date">First Air Date : ${result.first_air_date}</p>
+					<h3 id="contentHeading">${result.title}</h3>
+					<p id="date">Released on : ${result.release_date}</p>
 					<p id="rating">Rating : ${result.vote_average} / 10</p>
 					<p id="genre">Genre : ${movieGenre.join(', ')}</p>
 				</div>
@@ -178,6 +170,8 @@ let getMovie = async () => {
 			
 				<!-- CasrCrew -->
 				<div class="castCrew">
+					<h5>Director</h5>
+					<p id="director">Director</p>
 					<h5>Cast</h5>
 					<p id="cast">Cast</p>
 				</div>
@@ -196,7 +190,7 @@ let getMovie = async () => {
 				a++;
 			});
 		} else {
-			printStr = `<div class="container"><h3 class="container"><span id="error">No Tv show found</span></h3></div>`;
+			printStr = `<div class="container"><h3 class="container"><span id="error">No movie found</span></h3></div>`;
 			main.innerHTML += printStr;
 		}
 	} catch (error) {
@@ -212,8 +206,9 @@ let loadCastCrew = async (ccUrl, a) => {
 	let ccData = await res.json();
 
 	let castCrew = '';
-
+	let crewDirector = '';
 	let cast = document.querySelectorAll('#cast');
+	let director = document.querySelectorAll('#director');
 
 	//Cast Details
 	try {
@@ -229,6 +224,23 @@ let loadCastCrew = async (ccUrl, a) => {
 		cast[a].innerHTML = castCrew;
 	} catch (error) {
 		castCrew += `<span id="error">${error.message}</span>`;
+	}
+
+	//Crew
+	try {
+		var crewArr = ccData.crew;
+
+		crewArr.forEach((crew) => {
+			if (crew.job == 'Director') {
+				crewDirector += `<span id="crewName">${crew.name}</span>`;
+			}
+		});
+		if (crewDirector == '') {
+			crewDirector = 'No data';
+		}
+		director[a].innerHTML = crewDirector;
+	} catch (error) {
+		crewDirector += `<span id="error">${error.message}</span>`;
 	}
 };
 
