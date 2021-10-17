@@ -81,9 +81,9 @@ select {
 	width: 15%;
 	height: 25px;
 	border: none;
+	border-radius: 20px;
 }
 input[type='text'] {
-	/* border: 1px solid rgb(27 128 204 / 80%); */
 	border: none;
 	width: 70%;
 	outline: none;
